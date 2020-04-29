@@ -1,0 +1,17 @@
+{
+  "name": "konstantin-s/hexlet-slim-example",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Konstantin Sumarokov",
+      "email": "konstantin-s@dev.dev"
+    }
+  ],
+  "require": {
+    "slim/slim": "4.5.0",
+    "slim/psr7": "1.0.0",
+    "slim/http": "1.0.0"
+  }
+}
