@@ -11,7 +11,7 @@ $app->addErrorMiddleware(true, true, true);
 $app->get(
     '/',
     function ($request, $response) {
-        return $response->write('Welcome to Slim!');
+        return $response->write('Welcome to Hexlet!');
     }
 );
 $app->run();
