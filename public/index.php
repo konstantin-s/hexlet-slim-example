@@ -1,22 +1,10 @@
 <?php
 
-// Подключение автозагрузки через composer
-require __DIR__ . '/../vendor/autoload.php';
-
 use Slim\Factory\AppFactory;
 
-$faker = \Faker\Factory::create();
-$faker->seed(1234);
+require 'vendor/autoload.php';
 
-$domains = [];
-for ($i = 0; $i < 10; $i++) {
-    $domains[] = $faker->domainName;
-}
-
-$phones = [];
-for ($i = 0; $i < 10; $i++) {
-    $phones[] = $faker->phoneNumber;
-}
+$companies = App\Generator::generate(100);
 
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
@@ -24,21 +12,33 @@ $app->addErrorMiddleware(true, true, true);
 $app->get(
     '/',
     function ($request, $response) {
-        return $response->write('go to the /phones or /domains');
+        return $response->write('go to the /companies');
     }
 );
 
 // BEGIN (write your solution here)
 $app->get(
-    '/phones',
-    function ($request, $response) use ($phones) {
-        return $response->write(json_encode($phones));
-    }
-);
-$app->get(
-    '/domains',
-    function ($request, $response) use ($domains) {
-        return $response->write(json_encode($domains));
+    '/companies',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($companies) {
+        $pageSize = $request->getQueryParam('per') ?: 5;
+        $recordsCount = count($companies);
+
+        if ($pageSize <= 0) {
+            return $response->withStatus(404);
+        }
+        if (strlen($request->getQueryParam('page')) && (int)$request->getQueryParam('page') <= 0) {
+            return $response->withStatus(404);
+        }
+
+        $pageRequested = (int)$request->getQueryParam('page');
+        if ($pageRequested > 0) {
+            $pageRequested--;
+        }
+        if ($pageRequested * $pageSize > $recordsCount) {
+            return $response->withStatus(404);
+        }
+
+        return $response->write(json_encode(array_slice($companies, $pageRequested * $pageSize, $pageSize)));
     }
 );
 // END
