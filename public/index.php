@@ -85,8 +85,17 @@ $app->get(
 $app->get(
     '/users',
     function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($users) {
+        $term = $request->getQueryParam('term');
+        if (strlen($term)) {
+            $users = collect($users)->filter(
+                function ($user) use ($term) {
+                    return \Stringy\Stringy::create($user['firstName'])->startsWith($term, false);
+                }
+            );
+        }
         $params = [
-            'users' => $users
+            'users' => $users,
+            'term' => htmlspecialchars($term)
         ];
         return $this->get('renderer')->render($response, 'users/index.phtml', $params);
     }
