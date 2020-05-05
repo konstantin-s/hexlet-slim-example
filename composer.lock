@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "229d7dd3f8e2ae7541094e45b679966f",
+    "content-hash": "23a9bec4187c3166944fb9f2b1ee4b87",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -2430,6 +2430,54 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
+        },
+        {
+            "name": "slim/flash",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/slimphp/Slim-Flash.git",
+                "reference": "9aaff5fded3b54f4e519ec3d4ac74d3d1f2cbbbc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/slimphp/Slim-Flash/zipball/9aaff5fded3b54f4e519ec3d4ac74d3d1f2cbbbc",
+                "reference": "9aaff5fded3b54f4e519ec3d4ac74d3d1f2cbbbc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Slim\\Flash\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Lockhart",
+                    "email": "hello@joshlockhart.com",
+                    "homepage": "http://joshlockhart.com"
+                }
+            ],
+            "description": "Slim Framework Flash message service provider",
+            "homepage": "http://slimframework.com",
+            "keywords": [
+                "flash",
+                "framework",
+                "message",
+                "provider",
+                "slim"
+            ],
+            "time": "2017-10-22T10:35:05+00:00"
         },
         {
             "name": "slim/http",

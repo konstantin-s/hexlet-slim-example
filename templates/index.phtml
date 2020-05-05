@@ -1,0 +1,10 @@
+<a href="/courses">/courses</a>
+<form action="/coursesFlash" method="post">
+    <input type="submit" value="Create Course">
+</form>
+
+<!-- BEGIN (write your solution here) -->
+<? foreach ($messagesSuccess as $message): ?>
+    <div><?= $message ?></div>
+<? endforeach; ?>
+<!-- END -->

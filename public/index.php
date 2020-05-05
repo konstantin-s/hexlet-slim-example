@@ -4,6 +4,9 @@
 use DI\Container;
 use Slim\Factory\AppFactory;
 
+// Старт PHP сессии
+session_start();
+
 require 'vendor/autoload.php';
 
 $repo = new App\Repository();
@@ -16,6 +19,13 @@ $container->set(
         return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
     }
 );
+$container->set(
+    'flash',
+    function () {
+        return new \Slim\Flash\Messages();
+    }
+);
+
 AppFactory::setContainer($container);
 
 $app = AppFactory::create();
@@ -25,10 +35,21 @@ $companies = App\Generator::generate(100);
 $app->get(
     '/',
     function ($request, $response) {
-        return $response->write('<a href="/courses">/courses</a>');
+        /** @var \Slim\Flash\Messages $flash */
+//        $flash = $this->get('flash');
+//        $flash->getMessages();
+        $messages = $this->get('flash')->getMessages();
+        $params = ['messagesSuccess' => $messages['success'] ?: []];
+        return $this->get('renderer')->render($response, 'index.phtml', $params);
     }
 );
-
+$app->post(
+    '/coursesFlash',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) {
+        $this->get('flash')->addMessage('success', 'Course Added');
+        return $response->withRedirect('/', 302);
+    }
+);
 // BEGIN (write your solution here)
 $app->get(
     '/companies',
