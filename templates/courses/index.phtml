@@ -1,11 +1,21 @@
+<a href="/courses/new">/courses/new</a>
 <table>
+    <tr>
+        <th>id</th>
+        <th>title</th>
+        <th>paid</th>
+    </tr>
+
     <?php foreach ($courses as $course): ?>
         <tr>
             <td>
-                <?= $course['id'] ?>
+                <?= htmlspecialchars($course['id']) ?>
             </td>
             <td>
-                <?= $course['name'] ?>
+                <?= htmlspecialchars($course['title']) ?>
+            </td>
+            <td>
+                <?= htmlspecialchars($course['paid']) ?>
             </td>
         </tr>
     <?php endforeach ?>

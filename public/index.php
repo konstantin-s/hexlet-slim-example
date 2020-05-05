@@ -6,6 +6,8 @@ use Slim\Factory\AppFactory;
 
 require 'vendor/autoload.php';
 
+$repo = new App\Repository();
+
 $container = new Container();
 $container->set(
     'renderer',
@@ -23,7 +25,7 @@ $companies = App\Generator::generate(100);
 $app->get(
     '/',
     function ($request, $response) {
-        return $response->write('go to the /companies');
+        return $response->write('<a href="/courses">/courses</a>');
     }
 );
 
@@ -100,16 +102,35 @@ $app->get(
         return $this->get('renderer')->render($response, 'users/index.phtml', $params);
     }
 );
+// BEGIN (write your solution here)
+$app->get(
+    '/courses/new',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repo) {
+        $params = ['course' => ['title' => '', 'paid' => ''], 'errors' => []];
+        return $this->get('renderer')->render($response, 'courses/new.phtml', $params);
+    }
+);
+$app->post(
+    '/courses',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repo) {
+        $course = $request->getParsedBodyParam('course');
+        $errors = (new \App\Validator())->validate($course);
+        if (count($errors) === 0) {
+            $repo->save($course);
+            return $response->withRedirect('/courses', 302);
+        }
 
-$courses = [['id' => 123, 'name' => 'coursename-' . rand()], ['id' => 423, 'name' => 'coursename-' . rand()]];
+        $params = ['course' => $course, 'errors' => $errors];
+        return $this->get('renderer')->render($response->withStatus(422), 'courses/new.phtml', $params);
+    }
+);
 $app->get(
     '/courses',
-    function ($request, $response) use ($courses) {
-        $params = [
-            'courses' => $courses
-        ];
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repo) {
+        $params = ['courses' => $repo->all()];
         return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
     }
 );
+// END
 
 $app->run();
