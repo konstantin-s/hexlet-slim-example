@@ -68,23 +68,39 @@ $app->get(
 );
 //
 
-
+$users = App\Generator::generateUsers(100);
 $app->get(
     '/users/{id}',
-    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, $args) {
-        $params = ['id' => $args['id'], 'nickname' => 'user-' . $args['id']];
-        // Указанный путь считается относительно базовой директории для шаблонов, заданной на этапе конфигурации
-        // $this доступен внутри анонимной функции благодаря https://php.net/manual/ru/closure.bindto.php
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, $args) use ($users) {
+        $user = collect($users)->firstWhere('id', $args['id']);
+        if (empty($user)) {
+            return $response->write('Page not found')->withStatus(404);
+        }
+        $params = [
+            'user' => $user
+        ];
         return $this->get('renderer')->render($response, 'users/show.phtml', $params);
     }
 );
+$app->get(
+    '/users',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($users) {
+        $params = [
+            'users' => $users
+        ];
+        return $this->get('renderer')->render($response, 'users/index.phtml', $params);
+    }
+);
 
-$courses = [['id' => 123, 'name' => 'coursename-' . rand()],['id' => 423, 'name' => 'coursename-' . rand()]];
-$app->get('/courses', function ($request, $response) use ($courses) {
-    $params = [
-        'courses' => $courses
-    ];
-    return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
-});
+$courses = [['id' => 123, 'name' => 'coursename-' . rand()], ['id' => 423, 'name' => 'coursename-' . rand()]];
+$app->get(
+    '/courses',
+    function ($request, $response) use ($courses) {
+        $params = [
+            'courses' => $courses
+        ];
+        return $this->get('renderer')->render($response, 'courses/index.phtml', $params);
+    }
+);
 
 $app->run();
