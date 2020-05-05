@@ -43,4 +43,18 @@ $app->get(
 );
 // END
 
+
+$app->get(
+    '/companies/{id}',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, array $args) use ($companies) {
+        $company = collect($companies)->firstWhere('id', $args['id']);
+        if (empty($company)) {
+            return $response->write('Page not found')->withStatus(404);
+        }
+
+        return $response->write(json_encode($company));
+    }
+);
+//
+
 $app->run();
