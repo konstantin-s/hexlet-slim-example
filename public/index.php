@@ -31,6 +31,80 @@ AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
+// BEGIN (write your solution here)
+$router = $app->getRouteCollector()->getRouteParser();
+
+$repoPosts = new App\RepositoryPost();
+
+$app->get(
+    '/posts',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repoPosts, $router) {
+        $posts = $repoPosts->all();
+
+        $pageSize = $request->getQueryParam('per') ?: 5;
+        $recordsCount = count($posts);
+
+        if ($pageSize <= 0) {
+            return $response->withStatus(404);
+        }
+        if (strlen($request->getQueryParam('page')) && (int)$request->getQueryParam('page') <= 0) {
+            return $response->withStatus(404);
+        }
+
+        $pageRequested = (int)$request->getQueryParam('page');
+        if ($pageRequested > 0) {
+            $pageRequested--;
+        }
+        if ($pageRequested * $pageSize >= $recordsCount) {
+            return $response->withStatus(404);
+        }
+
+        $posts = array_slice($posts, $pageRequested * $pageSize, $pageSize);
+        $posts = array_map(
+            function ($post) use ($router) {
+                $post['urlDetail'] = $router->relativeUrlFor('postshow', ['id' => $post['id']]);
+                return $post;
+            },
+            $posts
+        );
+
+        $prevPage = $pageRequested - 1;
+        $nextPage = $pageRequested + 1;
+        $prevPageUrl = '';
+        $nextPageUrl = '';
+        if ($pageRequested > 0) {
+            $prevPageUrl = sprintf("%s?page=%d", $router->urlFor('posts'), $prevPage + 1);
+        }
+
+        if ($nextPage * $pageSize < $recordsCount) {
+            $nextPageUrl = sprintf("%s?page=%d", $router->urlFor('posts'), $nextPage + 1);
+        }
+
+        $params = [
+            'posts' => $posts,
+            'prevPageUrl' => $prevPageUrl,
+            'nextPageUrl' => $nextPageUrl,
+        ];
+        return $this->get('renderer')->render($response, 'posts/index.phtml', $params);
+    }
+)->setName('posts');
+$app->get(
+    '/posts/{id}',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, array $args) use ($repoPosts, $router) {
+        $post = $repoPosts->find($args['id']);
+        if (empty($post)) {
+            return $response->write('Page not found')->withStatus(404);
+        }
+        $params = [
+            'post' => $post,
+            'listUrl' => $router->urlFor('posts')
+        ];
+        return $this->get('renderer')->render($response, 'posts/show.phtml', $params);
+    }
+)->setName('postshow');
+// END
+
+
 $companies = App\Generator::generate(100);
 $app->get(
     '/',

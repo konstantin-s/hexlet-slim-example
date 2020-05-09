@@ -1,0 +1,11 @@
+<?php foreach ($posts as $post): ?>
+    <div>
+        <a href="<?= $post['urlDetail'] ?>"><?= $post['name'] ?></a>
+    </div>
+<?php endforeach; ?>
+<? if ($prevPageUrl): ?>
+    <a href="<?= $prevPageUrl ?>">назад</a>
+<? endif ?>
+<? if ($nextPageUrl): ?>
+    <a href="<?= $nextPageUrl ?>">вперед</a>
+<? endif ?>

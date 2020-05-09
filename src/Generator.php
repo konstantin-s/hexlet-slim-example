@@ -22,6 +22,7 @@ class Generator
 
         return $companies;
     }
+
     public static function generateUsers($count)
     {
         $range = range(1, $count - 2);
@@ -54,5 +55,25 @@ class Generator
         ];
 
         return $users;
+    }
+
+    public static function generatePosts($count)
+    {
+        $numbers = range(1, $count);
+        shuffle($numbers);
+
+        $faker = \Faker\Factory::create();
+        $faker->seed(1);
+        $posts = [];
+        for ($i = 0; $i < $count; $i++) {
+            $posts[] = [
+                'id' => $faker->uuid,
+                'name' => $faker->text(70),
+                'body' => $faker->sentence,
+                'slug' => $faker->slug
+            ];
+        }
+
+        return $posts;
     }
 }
