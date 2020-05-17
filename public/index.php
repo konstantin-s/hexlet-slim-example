@@ -115,15 +115,50 @@ $app->get(
 $app->post(
     '/posts',
     function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repo, $router) {
-        $post = $request->getParsedBodyParam('post');
-        $errors = (new \App\Validator())->validate($post);
+        $postData = $request->getParsedBodyParam('post');
+        $errors = (new \App\Validator())->validate($postData);
         if (count($errors) === 0) {
-            $repo->save($post);
+            $id = $repo->save($postData);
             $this->get('flash')->addMessage('success', 'Post has been created');
-            return $response->withRedirect($router->urlFor('posts'), 302);
+            return $response->withHeader('X-ID', $id)
+                ->withRedirect($router->urlFor('posts'));
         }
-        $params = ['post' => $post, 'errors' => $errors];
+        $params = ['post' => $postData, 'errors' => $errors];
         return $this->get('renderer')->render($response->withStatus(422), 'posts/new.phtml', $params);
+    }
+);
+
+$app->get(
+    '/posts/{id}/edit',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, array $args) use ($repo, $router) {
+        $postData = $repo->find($args['id']);
+        if (empty($postData)) {
+            return $response->write('Page not found')->withStatus(404);
+        }
+
+        $params = ['postData' => $postData,];
+        return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
+    }
+)->setName('postsedit');
+$app->patch(
+    '/posts/{id}',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, array $args) use ($repo, $router) {
+        $post = $repo->find($args['id']);
+        if (empty($post)) {
+            return $response->write('Page not found')->withStatus(404);
+        }
+
+        $postData = $request->getParsedBodyParam('post');
+        $errors = (new \App\Validator())->validate($postData);
+        if (count($errors) === 0) {
+            $postData['id'] = $args['id'];
+            $id = $repo->save($postData);
+            $this->get('flash')->addMessage('success', 'Post has been updated');
+            return $response->withHeader('X-ID', $id)
+                ->withRedirect($router->urlFor('posts'));
+        }
+        $params = ['postData' => $postData, 'errors' => $errors];
+        return $this->get('renderer')->render($response->withStatus(422), 'posts/edit.phtml', $params);
     }
 );
 // END
