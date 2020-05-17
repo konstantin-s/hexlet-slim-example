@@ -80,7 +80,10 @@ $app->get(
             $nextPageUrl = sprintf("%s?page=%d", $router->urlFor('posts'), $nextPage + 1);
         }
 
+        $flash = $this->get('flash')->getMessages();
+
         $params = [
+            'flash' => $flash,
             'posts' => $posts,
             'prevPageUrl' => $prevPageUrl,
             'nextPageUrl' => $nextPageUrl,
@@ -102,6 +105,27 @@ $app->get(
         return $this->get('renderer')->render($response, 'posts/show.phtml', $params);
     }
 )->setName('postshow');
+$app->get(
+    '/posts/new',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) {
+        $params = ['post' => ['name' => '', 'body' => ''], 'errors' => []];
+        return $this->get('renderer')->render($response, 'posts/new.phtml', $params);
+    }
+)->setName('postsnew');
+$app->post(
+    '/posts',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) use ($repo, $router) {
+        $post = $request->getParsedBodyParam('post');
+        $errors = (new \App\Validator())->validate($post);
+        if (count($errors) === 0) {
+            $repo->save($post);
+            $this->get('flash')->addMessage('success', 'Post has been created');
+            return $response->withRedirect($router->urlFor('posts'), 302);
+        }
+        $params = ['post' => $post, 'errors' => $errors];
+        return $this->get('renderer')->render($response->withStatus(422), 'posts/new.phtml', $params);
+    }
+);
 // END
 
 

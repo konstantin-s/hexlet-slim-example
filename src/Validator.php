@@ -19,4 +19,18 @@ class Validator implements ValidatorInterface
         return $errors;
         // END
     }
+
+    public function validatePost(array $post)
+    {
+        $errors = [];
+        if ($post['name'] == '') {
+            $errors['name'] = "Can't be blank";
+        }
+
+        if (empty($post['body'])) {
+            $errors['body'] = "Can't be blank";
+        }
+
+        return $errors;
+    }
 }
