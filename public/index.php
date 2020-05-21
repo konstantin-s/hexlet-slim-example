@@ -105,6 +105,17 @@ $app->get(
         return $this->get('renderer')->render($response, 'posts/show.phtml', $params);
     }
 )->setName('postshow');
+
+/** @var \App\RepositoryPost $repo */
+$repo;
+$app->delete(
+    '/posts/{id}',
+    function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response, array $args) use ($repo, $router) {
+        $repo->destroy($args['id']);
+        $this->get('flash')->addMessage('success', 'Post has been removed');
+        return $response->withRedirect($router->urlFor('posts'));
+    }
+)->setName('postdel');
 $app->get(
     '/posts/new',
     function (\Slim\Http\ServerRequest $request, \Slim\Http\Response $response) {

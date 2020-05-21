@@ -1,6 +1,10 @@
 <?php foreach ($posts as $post): ?>
     <div>
-        <a href="<?= $post['urlDetail'] ?>"><?= $post['name'] ?></a>
+        <a href="/post/<?= $post['id'] ?>"><?= $post['name'] ?></a>
+        <form action="/post/<?= $post['id'] ?>" method="post">
+            <input type="hidden" name="_METHOD" value="DELETE">
+            <input type="submit" value="DELETE">
+        </form>
     </div>
 <?php endforeach; ?>
 <? if ($prevPageUrl): ?>
